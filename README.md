@@ -1,14 +1,19 @@
 # Cube
+
+[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
+
 ### C++ OpenGL cube test
 
-#### Use W, A, S, and D to rotate the cube
+##### Instructions
+Run `Cube GB.exe`
+
+Use w,a,s and d to rotate the cube
 
 
-Demonstrates a cube with two light sources
-```
-	- green
-	- blue
-```
+There are two light sources:
 
+*  green
+*  blue
 
-Written in C++, uses freeglut for window handling
+##### Info
+Written in C++, uses freeglut for window handling as well as OpenGL for 3D rendering
