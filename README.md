@@ -9,7 +9,7 @@ Run `Cube GB.exe`
 
 Use w,a,s and d to rotate the cube
 
-
+<br>
 There are two light sources:
 
 *  green
