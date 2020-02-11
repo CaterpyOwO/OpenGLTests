@@ -1,19 +1,3 @@
-///-----------------------------------------------------------------------------
-/// 
-/// \file	main.cpp
-/// \date	15/3/2005
-/// \author	Rob Bateman
-/// \brief	This demonstrates how to use a spring to make the camera smoothly 
-///			follow a given point. This is really useful for cameras within games.
-///			It works by using a target position and an actual position for the
-///			camera. A spring is then used to keep the cameras actual position
-///			close to where the target position. Because a spring is used to connect
-///			the two, there is a little bit of lag before the camera catches up 
-///			with the target. The result is fairly nice ;) 
-/// \note	DampenedSpring() is the important function here!
-///
-//-------------------------------------------------------------------------------
-
 #include <iostream>
 #include <GL/glut.h>
 #include <math.h>
@@ -110,7 +94,7 @@ void OnDisplay()
 	// set camera position
 	glRotatef(angle,0,1,0);
 	glRotatef(angley,1,0,0);
-	
+
 
 	glTranslatef(position[0],position[1],position[2]);
 
@@ -226,8 +210,8 @@ void onMotion(int x, int y){
 
 
 if (Buttons[0]){
-	angle = 0;//-= (float) 0.5f * diffx;
-	angley -= (float) 0.5f * diffy;
+	angle -= (float) 0.3f * diffx;
+	angley -= (float) 0.3f * diffy;
 }
 
 }
@@ -265,28 +249,3 @@ int main(int argc,char** argv)
 
 	glutMainLoop();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
