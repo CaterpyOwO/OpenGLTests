@@ -3,16 +3,16 @@
 #include <math.h>
 #include "FrameTimer.h"
 
-/// the y rotation of the camera in degrees
+///camera rotation in degrees
 float angle=0;
 float angley=0;
 
-///location of click
+///last location of click
 int lastx;
 int lasty;
 
 ///button boolean
-float Buttons[1]={0};
+float button = false;
 
 /// the angle resolved into a direction vector
 float direction[3]={0,0,-1};
@@ -20,8 +20,7 @@ float direction[3]={0,0,-1};
 /// the inverted position of the camera.
 float position[3]={0,-2,0};
 
-/// the target position of the camera (not inverted). Just simply change
-/// this target position and the camera will follow.... 
+/// the target position of the camera (not inverted)
 float target[3]={0,2,0};
 
 /// the strength of the spring. Higher values make the camera more rigid.
@@ -76,30 +75,27 @@ void DampenedSpring(float *CurrentPosition,
 
 
 
-//-------------------------------------------------------------------------------	OnInit()
-//
 void OnInit() 
 {
 	InitFrameTimer();
 }
 
-//-------------------------------------------------------------------------------	OnDisplay()
-//
+
 void OnDisplay()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	glLoadIdentity();
 
-	// set camera position
+	// set camera angle
 	glRotatef(angle,0,1,0);
-	glRotatef(angley,1,0,0);
+	glRotatef(angley,direction[2],0,direction[0]);
 
-
+	// set camera position
 	glTranslatef(position[0],position[1],position[2]);
 
-	// draw grid
 	glBegin(GL_LINES);
+	// draw grid
 	for(int i=-10;i<=10;++i) {
 		glVertex3f(i,0,-10);
 		glVertex3f(i,0,10);
@@ -107,15 +103,12 @@ void OnDisplay()
 		glVertex3f(10,0,i);
 		glVertex3f(-10,0,i);
 	}
-		glVertex3f(5,5,5);
-		glVertex3f(8,8,8);
 	glEnd();
 
 	glutSwapBuffers();
 }
 
-//-------------------------------------------------------------------------------	OnReshape()
-//
+
 void OnReshape(int w, int h)
 {
 	// prevent divide by 0 error when minimised
@@ -130,52 +123,55 @@ void OnReshape(int w, int h)
 	glLoadIdentity();
 }
 
-/// used to keep track of the cursor key states
+/// cursor key states
 bool g_keys[128]={false};
 
 
-//-------------------------------------------------------------------------------	OnIdle()
-//
 void OnIdle() {
 
-	// update the frame timer
+	// update frame timer
 	SortFrameTimer();
 
-	// will hold the new position for the camera
+	// hold the new position for the camera
 	float NewPosition[3];
 
 	// get the frame time
 	float dt = FrameTime();
-
-	// if turning left
-	if (g_keys['a']) {
-		angle -= dt * 90.0f;
-	}
-
-	// if turning right
-	if (g_keys['d']) {
-		angle += dt * 90.0f;
-	}
 
 	// calculate the direction vector from the angle
 	direction[0] = sin(angle*3.14159f/180.0f);
 	direction[2] = -cos(angle*3.14159f/180.0f);
 	direction[1] = 0.0f;
 
-	// move the target forward relative to the direction vector
+	//move left
+	if (g_keys['a']) {
+		target[0] -= sin((angle+90)*3.14159f/180.0f)*dt*5.0f;
+		target[1] -= direction[1]*dt*5.0f;
+		target[2] -= -cos((angle+90)*3.14159f/180.0f)*dt*5.0f;
+	}
+
+	// move right
+	if (g_keys['d']) {
+		target[0] -= sin((angle-90)*3.14159f/180.0f)*dt*5.0f;
+		target[1] -= direction[1]*dt*5.0f;
+		target[2] -= -cos((angle-90)*3.14159f/180.0f)*dt*5.0f;
+	}
+
+
+	// move forward
 	if (g_keys['w']) {
 		target[0] += direction[0]*dt*5.0f;
 		target[1] += direction[1]*dt*5.0f;
 		target[2] += direction[2]*dt*5.0f;
 	}
-	// move the target backwards relative to the direction vector
+	// move backwards
 	if (g_keys['s']) {
 		target[0] -= direction[0]*dt*5.0f;
 		target[1] -= direction[1]*dt*5.0f;
 		target[2] -= direction[2]*dt*5.0f;
 	}
 
-	// clauclate a new position for the camera
+	// calculate new position for camera
 	DampenedSpring(position,target,NewPosition,dt); 
 
 	// update the position
@@ -187,65 +183,64 @@ void OnIdle() {
 	glutPostRedisplay();
 }
 
-//-------------------------------------------------------------------------------	OnSpecial()
-//
+// key input
 void OnKey(unsigned char key,int,int) {
 	g_keys[key]=true;
 }
 
+// mouse input
 void onMouse(int b, int s, int x, int y){
 	lastx=x;
 	lasty=y;
-
-	Buttons[0] = true;
+	button = true;
 }
 
+// mouse motion input
 void onMotion(int x, int y){
-	std::cout << y << " " << x << std::endl;
-
 	int diffx=x-lastx;
 	int diffy=y-lasty;
+
 	lastx=x;
 	lasty=y;
 
 
-if (Buttons[0]){
+if (button){
 	angle -= (float) 0.3f * diffx;
 	angley -= (float) 0.3f * diffy;
 }
 
 }
-//-------------------------------------------------------------------------------	OnSpecialUp()
-//
+
+// update key press
 void OnKeyUp(unsigned char key,int,int) {
 	g_keys[key]=false;
 }
 
-//-------------------------------------------------------------------------------	main()
-///
+//main function
 int main(int argc,char** argv)
 {
 	glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(640,480);
 	glutInitWindowPosition(100,100);
-	glutCreateWindow("Camera");
+	glutCreateWindow("Camera v1.2");
 	
 	// set glut callbacks
 	glutDisplayFunc(OnDisplay);
 	glutReshapeFunc(OnReshape);
 
+	// set key callbacks
 	glutKeyboardFunc(OnKey);
 	glutKeyboardUpFunc(OnKeyUp);
 
-
+	// set mouse callbacks
 	glutMotionFunc(onMotion);
 	glutMouseFunc(onMouse);
 
-
+	// set idle function
 	glutIdleFunc(OnIdle);
 
+	// initialize camera
 	OnInit();
-
 	glutMainLoop();
 }
