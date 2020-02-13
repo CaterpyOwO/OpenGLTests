@@ -3,6 +3,10 @@
 #include <math.h>
 #include "FrameTimer.h"
 
+///OBJ loader globals
+GLuint elephant;
+float elephantrot;
+
 ///camera rotation in degrees
 float angle=0;
 float angley=0;
@@ -14,6 +18,9 @@ int lasty;
 ///button boolean
 float button = false;
 
+///
+float id;
+
 /// the angle resolved into a direction vector
 float direction[3]={0,0,-1};
 
@@ -21,7 +28,7 @@ float direction[3]={0,0,-1};
 float position[3]={0,-2,0};
 
 /// the target position of the camera (not inverted)
-float target[3]={0,2,0};
+float target[3]={0,2,-3};
 
 /// the strength of the spring. Higher values make the camera more rigid.
 float spring_strength=0.5;
@@ -73,11 +80,44 @@ void DampenedSpring(float *CurrentPosition,
 	NewPosition[2] -= Displacement[2];
 }
 
-
+void loadObj(const char* fname)
+{
+FILE *fp;
+int read;
+GLfloat x, y, z;
+char ch;
+elephant=glGenLists(1);
+fp=fopen(fname,"r");
+if (!fp) 
+    {
+        printf("can't open file %s\n", fname);
+	  exit(1);
+    }
+glPointSize(2.0);
+glNewList(elephant, GL_COMPILE);
+{
+glPushMatrix();
+glBegin(GL_POINTS);
+while(!(feof(fp)))
+ {
+  read=fscanf(fp,"%c %f %f %f",&ch,&x,&y,&z);
+  if(read==4&&ch=='v')
+  {
+   glVertex3f(x,y+2,z);
+  }
+ }
+glEnd();
+}
+glPopMatrix();
+glEndList();
+fclose(fp);
+}
 
 void OnInit() 
 {
+	glutSetCursor(GLUT_CURSOR_NONE);
 	InitFrameTimer();
+	loadObj("data/teapot.obj");
 }
 
 
@@ -88,8 +128,9 @@ void OnDisplay()
 	glLoadIdentity();
 
 	// set camera angle
+	glRotatef(-angley,direction[2]*2.0f,0,0);
 	glRotatef(angle,0,1,0);
-	glRotatef(angley,direction[2],0,direction[0]);
+
 
 	// set camera position
 	glTranslatef(position[0],position[1],position[2]);
@@ -105,6 +146,27 @@ void OnDisplay()
 	}
 	glEnd();
 
+	//render & rotate teapot
+	glPushMatrix();
+		glRotatef(elephantrot,0,1,0);
+		glCallList(elephant);
+		elephantrot=elephantrot+0.1;
+		if(elephantrot>360)elephantrot=elephantrot-360;
+	glPopMatrix();
+
+	//optional lol text
+/*
+	glTranslatef(-15,20,0);	
+	glScalef(0.1,0.1,0.1);
+
+	glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, 'l');
+
+	glTranslatef(0,0,0);
+	glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, 'o');
+
+	glTranslatef(10,0,0);
+	glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, 'l');
+*/
 	glutSwapBuffers();
 }
 
@@ -214,7 +276,11 @@ if (button){
 // update key press
 void OnKeyUp(unsigned char key,int,int) {
 	g_keys[key]=false;
+	if (key == ''){
+		glutDestroyWindow(id);
+	}
 }
+
 
 //main function
 int main(int argc,char** argv)
@@ -223,7 +289,7 @@ int main(int argc,char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(640,480);
 	glutInitWindowPosition(100,100);
-	glutCreateWindow("Camera v1.2");
+	id = glutCreateWindow("Camera v1.3 + .obj loading");
 	
 	// set glut callbacks
 	glutDisplayFunc(OnDisplay);
@@ -234,8 +300,9 @@ int main(int argc,char** argv)
 	glutKeyboardUpFunc(OnKeyUp);
 
 	// set mouse callbacks
-	glutMotionFunc(onMotion);
+	glutPassiveMotionFunc(onMotion);
 	glutMouseFunc(onMouse);
+
 
 	// set idle function
 	glutIdleFunc(OnIdle);
@@ -244,3 +311,28 @@ int main(int argc,char** argv)
 	OnInit();
 	glutMainLoop();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
