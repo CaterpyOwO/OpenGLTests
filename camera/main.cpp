@@ -15,8 +15,6 @@ float angley=0;
 int lastx;
 int lasty;
 
-///button boolean
-float button = false;
 
 ///
 float id;
@@ -254,7 +252,6 @@ void OnKey(unsigned char key,int,int) {
 void onMouse(int b, int s, int x, int y){
 	lastx=x;
 	lasty=y;
-	button = true;
 }
 
 // mouse motion input
@@ -265,11 +262,9 @@ void onMotion(int x, int y){
 	lastx=x;
 	lasty=y;
 
-
-if (button){
 	angle -= (float) 0.3f * diffx;
 	angley -= (float) 0.3f * diffy;
-}
+
 
 }
 
@@ -311,3 +306,28 @@ int main(int argc,char** argv)
 	OnInit();
 	glutMainLoop();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
