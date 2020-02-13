@@ -28,7 +28,7 @@ float direction[3]={0,0,-1};
 float position[3]={0,-2,0};
 
 /// the target position of the camera (not inverted)
-float target[3]={0,2,-5};
+float target[3]={0,2,8};
 
 /// the strength of the spring. Higher values make the camera more rigid.
 float spring_strength=0.5;
@@ -128,7 +128,7 @@ void OnDisplay()
 	glLoadIdentity();
 
 	// set camera angle
-	glRotatef(-angley,direction[2]*2.0f,0,0);
+	glRotatef(angley,direction[2]*2.0f,0,0);
 	glRotatef(angle,0,1,0);
 
 
