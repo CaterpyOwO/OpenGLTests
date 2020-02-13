@@ -28,7 +28,7 @@ float direction[3]={0,0,-1};
 float position[3]={0,-2,0};
 
 /// the target position of the camera (not inverted)
-float target[3]={0,2,-3};
+float target[3]={0,2,-5};
 
 /// the strength of the spring. Higher values make the camera more rigid.
 float spring_strength=0.5;
@@ -311,28 +311,3 @@ int main(int argc,char** argv)
 	OnInit();
 	glutMainLoop();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
